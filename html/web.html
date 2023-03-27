@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/static/tailwind-3.2.6.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                }
+            }
+        }
+    </script>
+    <title>{{.mail.Subject}}</title>
+</head>
+
+<body class="pt-4 overflow-y-hidden">
+    {{if .headless}}
+    {{else}}
+    <div class="mx-4 pt-2 bg-gray-200 rounded-md shadow">
+        <div
+            class="mx-2 text-xl font-extrabold text-slate-900 tracking-tight dark:text-slate-200 overflow-x-hidden overflow-y-hidden">
+            {{.mail.Subject}}
+        </div>
+        <ul role="list" class="mx-2 divide-y divide-gray-100">
+            <li class="flex py-2">
+                <span class="text-gray-600">To</span>
+                <div class="ml-3">
+                    {{range .mail.To}}
+                    <span class="mx-1">
+                        <span class="font-medium text-gray-900">{{.Name}}</span>
+                        <span class="text-gray-600">{{.Address}}</span>
+                    </span>
+                    {{end}}
+                </div>
+            </li>
+            <li class="flex justify-between py-2">
+                <div>
+                    <span class="text-gray-600">From</span>
+                    <span class="ml-3">
+                        <span class=" font-medium text-gray-900">{{.mail.From.Name}}</span>
+                        <span class=" text-gray-600">{{.mail.From.Address}}</span>
+                    </span>
+                </div>
+                <div class="text-gray-600">{{.mail.Date}}</div>
+            </li>
+        </ul>
+    </div>
+    {{end}}
+    <!-- Mail content -->
+    <div class="space-y-2 py-4 sm:space-y-4 sm:px-6 lg:px-8 min-w-full overflow-y-hidden">
+        <div class="bg-white px-4 py-6 shadow sm:rounded-lg sm:px-6 min-h-screen overflow-y-hidden">
+            <iframe src="/_/{{.rawhtml}}" class="min-w-full min-h-screen overflow-y-hidden"></iframe>
+        </div>
+    </div>
+</body>
+
+</html>

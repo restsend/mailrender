@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/static/tailwind-3.2.6.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                }
+            }
+        }
+    </script>
+    <title>Mailrender by restsend.com</title>
+</head>
+
+<body>
+    <div class="bg-white py-12">
+        <div class="mx-auto max-w-2xl px-4">
+            <form action="/mailrender" method="POST" enctype="multipart/form-data">
+                <input type="file" name="content" id="file" />
+                <div class="pt-4 ">
+                    <label class="text-base font-semibold text-gray-900">Render options</label>
+                    <fieldset class="mt-4">
+                        <div class="pt-2">
+                            <p>Output format</p>
+                            <div class="space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10">
+                                <div class="flex items-center">
+                                    <input id="png" name="format" type="radio" value="png" checked
+                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                                    <label for="png"
+                                        class="ml-3 block text-sm font-medium leading-6 text-gray-900">PNG</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="pdf" name="format" type="radio" value="pdf"
+                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                                    <label for="pdf"
+                                        class="ml-3 block text-sm font-medium leading-6 text-gray-900">PDF</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-2">
+                            <p>Device</p>
+                            <div class="space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10">
+                                <div class="flex items-center">
+                                    <input id="web" name="device" type="radio" value="web" checked
+                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                                    <label for="web"
+                                        class="ml-3 block text-sm font-medium leading-6 text-gray-900">Web</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="iphone" name="device" type="radio" value="iphone"
+                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                                    <label for="iphone"
+                                        class="ml-3 block text-sm font-medium leading-6 text-gray-900">iPhone</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="gmail" name="device" type="radio" value="gmail"
+                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                                    <label for="gmail"
+                                        class="ml-3 block text-sm font-medium leading-6 text-gray-900">Gmail</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="outlook" name="device" type="radio" value="outlook"
+                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                                    <label for="outlook"
+                                        class="ml-3 block text-sm font-medium leading-6 text-gray-900">Outlook</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="headless" name="headless" type="checkbox" value="true"
+                                        class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                                    <label for="headless"
+                                        class="ml-3 block text-sm font-medium leading-6 text-gray-900">Only
+                                        content(headless)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <p>Waitload timeout</p>
+                            <input id="waitload" name="waitload" value="10" type="text">
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="pt-4">
+                    <input type="submit" value="submit"
+                        class="rounded bg-indigo-600 py-1 px-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"></input>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
