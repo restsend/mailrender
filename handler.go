@@ -36,7 +36,6 @@ const (
 
 var letterRunes = []rune("0123456789abcdefghijklmnopqrstuvwxyz")
 var chromePath = ""
-var maxWaitloadTimeout = 20 * time.Second
 
 func randRunes(n int, source []rune) string {
 	b := make([]rune, n)
@@ -298,11 +297,8 @@ func handleMailrender(c *gin.Context) {
 	} else {
 		b.DefaultDevice(devices.LaptopWithHiDPIScreen)
 	}
-	schema := "http"
-	if c.Request.TLS != nil {
-		schema = "https"
-	}
-	uri := fmt.Sprintf("%s://%s/_/%s.html", schema, c.Request.Host, mailid)
+	
+	uri := fmt.Sprintf("%s/_/%s.html", localServerAddr, mailid)
 	page := b.MustConnect().MustPage(uri)
 	if req.Waitload > 0 {
 		page = page.Timeout(time.Duration(req.Waitload) * time.Second)

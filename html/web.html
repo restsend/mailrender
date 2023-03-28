@@ -36,6 +36,7 @@
                     {{end}}
                 </div>
             </li>
+            {{if .mail.From}}
             <li class="flex justify-between py-2">
                 <div>
                     <span class="text-gray-600">From</span>
@@ -46,6 +47,7 @@
                 </div>
                 <div class="text-gray-600">{{.mail.Date}}</div>
             </li>
+            {{end}}
         </ul>
     </div>
     {{end}}
