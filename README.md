@@ -4,7 +4,7 @@ mailrender - Use the API to render emails as images or PDF
 ### Quick start
 1. run `mailrender` server
 ```bash
-go run .
+docker run --rm -ti --shm-size=500m -p 8000:8000 restsend/mailrender
 ```
 2. Render a .eml file:
 ```sh
