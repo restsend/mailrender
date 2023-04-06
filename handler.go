@@ -7,7 +7,6 @@ import (
 	"html/template"
 	"io"
 	"io/fs"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -54,8 +53,8 @@ func prepareStoreDir(storeDir string) error {
 	if err != nil {
 		log.Println("Prepare storedir:", storeDir)
 		return os.MkdirAll(storeDir, fs.ModePerm)
-
 	}
+
 	if !st.IsDir() {
 		return fmt.Errorf("storedir: %s is not directory", storeDir)
 	}
@@ -86,15 +85,17 @@ func loadTemplate(device string) string {
 }
 
 type RenderRequest struct {
-	Waitload  int    `json:"waitload" form:"waitload" query:"waitload"`
-	Format    string `json:"format" form:"format" query:"format"`
-	Device    string `json:"device" form:"device" query:"device"`
-	Headless  string `json:"headless" form:"headless" query:"headless"`
-	Textonly  bool   `json:"textonly" form:"textonly" query:"textonly"`
-	Timezone  string `json:"tz" form:"tz" query:"tz"`
-	Author    string `json:"author" form:"author" query:"author"`
-	Watermark string `json:"watermark" form:"watermark" query:"watermark"`
-	Content   string `json:"content,omitempty"`
+	Waitload  int     `json:"waitload" form:"waitload" query:"waitload"`
+	Format    string  `json:"format" form:"format" query:"format"`
+	Device    string  `json:"device" form:"device" query:"device"`
+	Headless  string  `json:"headless" form:"headless" query:"headless"`
+	Textonly  bool    `json:"textonly" form:"textonly" query:"textonly"`
+	Timezone  string  `json:"tz" form:"tz" query:"tz"`
+	Author    string  `json:"author" form:"author" query:"author"`
+	Watermark string  `json:"watermark" form:"watermark" query:"watermark"`
+	Content   string  `json:"content,omitempty"`
+	ViewPort  string  `json:"viewport" form:"viewport" query:"viewport"` // '0,0,800,800'
+	Scale     float64 `json:"scale" form:"scale" query:"scale"`
 }
 
 type Attachment struct {
@@ -173,6 +174,31 @@ func handleMailrender(c *gin.Context) {
 		log.Println("parse mail fail", err)
 		c.AbortWithError(http.StatusBadRequest, errors.New("parse mail fail "+err.Error()))
 		return
+	}
+
+	viewPort := req.ViewPort
+	var floatVps []float64
+	if viewPort != "" {
+		vp := strings.Split(viewPort, ",")
+		if len(vp) != 4 {
+			log.Println("invalid viewport", viewPort)
+			c.AbortWithError(http.StatusInternalServerError, errors.New("invalid view port "+viewPort))
+			return
+		}
+
+		for _, v := range vp {
+			f, err := strconv.ParseFloat(v, 64)
+			if err != nil {
+				log.Println("invalid viewport", viewPort, err)
+				c.AbortWithError(http.StatusInternalServerError, errors.New("invalid view port "+viewPort))
+				return
+			}
+			floatVps = append(floatVps, f)
+		}
+	}
+
+	if req.Scale <= 0 || req.Scale >= 2 {
+		req.Scale = 1
 	}
 
 	mail := Mail{
@@ -292,12 +318,17 @@ func handleMailrender(c *gin.Context) {
 		}
 	}()
 
-	if req.Device == DeviceiPhone {
+	switch req.Device {
+	case DeviceiPhone:
 		b = b.DefaultDevice(devices.IPhone6or7or8Plus)
-	} else {
-		b.DefaultDevice(devices.LaptopWithHiDPIScreen)
+	case DeviceWeb:
+		b = b.DefaultDevice(devices.LaptopWithMDPIScreen)
 	}
-	
+
+	if req.Waitload == 0 {
+		req.Waitload = 60
+	}
+
 	uri := fmt.Sprintf("%s/_/%s.html", localServerAddr, mailid)
 	page := b.MustConnect().MustPage(uri)
 	if req.Waitload > 0 {
@@ -311,6 +342,20 @@ func handleMailrender(c *gin.Context) {
 		page = page.MustWaitLoad()
 	}
 
+	var screenshotConfig *proto.PageCaptureScreenshot
+	if len(floatVps) > 0 {
+		screenshotConfig = &proto.PageCaptureScreenshot{
+			Clip: &proto.PageViewport{
+				X:      floatVps[0],
+				Y:      floatVps[1],
+				Width:  floatVps[2],
+				Height: floatVps[3],
+				Scale:  1,
+			},
+		}
+	}
+	screenshotConfig.Clip.Scale = float64(req.Scale)
+
 	var data []byte
 	var contentType string
 	if req.Format == "pdf" {
@@ -320,10 +365,10 @@ func handleMailrender(c *gin.Context) {
 			c.AbortWithError(http.StatusInternalServerError, errors.New("pdf fail "+err.Error()))
 			return
 		}
-		data, _ = ioutil.ReadAll(r)
+		data, _ = io.ReadAll(r)
 		contentType = "application/pdf"
 	} else {
-		data, err = page.Screenshot(true, nil)
+		data, err = page.Screenshot(true, screenshotConfig)
 		if err != nil {
 			log.Println("screenshot fail", uri, req.Device, err)
 			c.AbortWithError(http.StatusInternalServerError, errors.New("screenshot fail "+err.Error()))
