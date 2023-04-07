@@ -322,7 +322,7 @@ func handleMailrender(c *gin.Context) {
 	case DeviceiPhone:
 		b = b.DefaultDevice(devices.IPhone6or7or8Plus)
 	case DeviceWeb:
-		b = b.DefaultDevice(devices.LaptopWithMDPIScreen)
+		b = b.DefaultDevice(devices.LaptopWithHiDPIScreen)
 	}
 
 	if req.Waitload == 0 {
@@ -343,18 +343,17 @@ func handleMailrender(c *gin.Context) {
 	}
 
 	var screenshotConfig *proto.PageCaptureScreenshot
-	if len(floatVps) > 0 {
+	if len(floatVps) == 4 {
 		screenshotConfig = &proto.PageCaptureScreenshot{
 			Clip: &proto.PageViewport{
 				X:      floatVps[0],
 				Y:      floatVps[1],
 				Width:  floatVps[2],
 				Height: floatVps[3],
-				Scale:  1,
+				Scale:  req.Scale,
 			},
 		}
 	}
-	screenshotConfig.Clip.Scale = float64(req.Scale)
 
 	var data []byte
 	var contentType string
