@@ -33,6 +33,7 @@ Submit the data request in the way of `POST`, parameters through `urlquery`:
     - `watermark` Show watermark on image
     - `viewport` Viewport (x, y, width, height) for capturing screenshot, such as: `0,0,600,800`
     - `scale`  Scale Page scale factor, default is `1`
+    - `h`  Scale Page scale factor, default is `1`
 1. Parameters for form-data：
     - `content` file type, *required*
 

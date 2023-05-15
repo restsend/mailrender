@@ -96,6 +96,7 @@ type RenderRequest struct {
 	Content   string  `json:"content,omitempty"`
 	ViewPort  string  `json:"viewport" form:"viewport" query:"viewport"` // '0,0,800,800'
 	Scale     float64 `json:"scale" form:"scale" query:"scale"`
+	WithHiDPI bool    `json:"hidpi" form:"hidpi" query:"hidpi"`
 }
 
 type Attachment struct {
@@ -322,7 +323,12 @@ func handleMailrender(c *gin.Context) {
 	case DeviceiPhone:
 		b = b.DefaultDevice(devices.IPhone6or7or8Plus)
 	case DeviceWeb:
-		b = b.DefaultDevice(devices.LaptopWithHiDPIScreen)
+		if req.WithHiDPI {
+			b = b.DefaultDevice(devices.LaptopWithHiDPIScreen)
+		} else {
+			b = b.DefaultDevice(devices.LaptopWithMDPIScreen)
+		}
+
 	}
 
 	if req.Waitload == 0 {
